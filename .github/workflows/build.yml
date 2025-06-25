@@ -1,11 +1,9 @@
-name: Build and Release
+name: Build Executables
 
 on:
   push:
     tags: ['v*']
-
-permissions:
-  contents: write
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,13 +14,13 @@ jobs:
         include:
           - os: windows-latest
             executable_name: BibTeX-Deduplicator.exe
-            asset_name: BibTeX-Deduplicator-windows.exe
+            artifact_name: BibTeX-Deduplicator-windows.exe
           - os: macos-latest
             executable_name: BibTeX-Deduplicator
-            asset_name: BibTeX-Deduplicator-macos
+            artifact_name: BibTeX-Deduplicator-macos
           - os: ubuntu-latest
             executable_name: BibTeX-Deduplicator
-            asset_name: BibTeX-Deduplicator-linux
+            artifact_name: BibTeX-Deduplicator-linux
     
     steps:
     - name: Checkout code
@@ -45,49 +43,54 @@ jobs:
     - name: Build executable
       run: python build-deduplicator.py
     
-    - name: Rename executable for upload
-      shell: bash
-      run: |
-        cd dist
-        if [ "${{ runner.os }}" = "Windows" ]; then
-          mv BibTeX-Deduplicator.exe ${{ matrix.asset_name }}
-        else
-          mv BibTeX-Deduplicator ${{ matrix.asset_name }}
-        fi
-    
     - name: Upload executable as artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ matrix.asset_name }}
-        path: dist/${{ matrix.asset_name }}
+        name: ${{ matrix.artifact_name }}
+        path: dist/${{ matrix.executable_name }}
+        retention-days: 90
 
-  release:
+  # Job to collect all artifacts and commit to repo
+  commit-executables:
     needs: build
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    
     steps:
-    - name: Download all artifacts
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Create dist directory
+      run: mkdir -p dist
+    
+    - name: Download Windows executable
       uses: actions/download-artifact@v4
       with:
-        path: ./artifacts
+        name: BibTeX-Deduplicator-windows.exe
+        path: dist/
     
-    - name: Create Release
-      uses: ncipollo/create-release@v1
+    - name: Download macOS executable
+      uses: actions/download-artifact@v4
       with:
-        artifacts: "artifacts/*/*"
-        token: ${{ secrets.GITHUB_TOKEN }}
-        tag: ${{ github.ref_name }}
-        name: "BibTeX Deduplicator ${{ github.ref_name }}"
-        body: |
-          ## BibTeX Deduplicator ${{ github.ref_name }}
-          
-          Cross-platform executables for BibTeX deduplication.
-          
-          ### Downloads
-          - **Windows**: `BibTeX-Deduplicator-windows.exe`
-          - **macOS**: `BibTeX-Deduplicator-macos`
-          - **Linux**: `BibTeX-Deduplicator-linux`
-          
-          ### Usage
-          Simply download the appropriate file for your platform and double-click to run!
-        draft: false
-        prerelease: false
+        name: BibTeX-Deduplicator-macos
+        path: dist/
+    
+    - name: Download Linux executable
+      uses: actions/download-artifact@v4
+      with:
+        name: BibTeX-Deduplicator-linux
+        path: dist/
+    
+    - name: Rename executables
+      run: |
+        mv dist/BibTeX-Deduplicator.exe dist/BibTeX-Deduplicator-windows.exe
+        mv dist/BibTeX-Deduplicator dist/BibTeX-Deduplicator-macos
+        cp dist/BibTeX-Deduplicator-macos dist/BibTeX-Deduplicator-linux
+    
+    - name: Commit executables
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add dist/
+        git commit -m "Add built executables for ${{ github.ref_name }}" || exit 0
+        git push
