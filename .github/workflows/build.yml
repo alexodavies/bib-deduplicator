@@ -41,6 +41,10 @@ jobs:
     - name: Build executable
       run: python build-deduplicator.py
     
+    - name: Set executable permissions (macOS/Linux)
+      if: runner.os != 'Windows'
+      run: chmod +x dist/${{ matrix.executable_name }}
+    
     - name: Upload executable as artifact
       uses: actions/upload-artifact@v4
       with:
@@ -86,6 +90,11 @@ jobs:
         mv dist/BibTeX-Deduplicator.exe dist/BibTeX-Deduplicator-windows.exe
         mv dist/BibTeX-Deduplicator dist/BibTeX-Deduplicator-macos
         cp dist/BibTeX-Deduplicator-macos dist/BibTeX-Deduplicator-linux
+    
+    - name: Set executable permissions for release files
+      run: |
+        chmod +x dist/BibTeX-Deduplicator-macos
+        chmod +x dist/BibTeX-Deduplicator-linux
     
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v2
