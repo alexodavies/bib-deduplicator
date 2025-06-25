@@ -16,11 +16,11 @@ A powerful GUI and command-line tool for detecting and removing duplicate entrie
 
 ### Option 1: Download Pre-built Application (Recommended)
 
-1. Go to the [Releases](../../releases) page or check the `dist/` directory
+1. Go to the [Releases](../../releases) page
 2. Download the appropriate version for your operating system:
-   - **Windows**: `BibTeX-Deduplicator.exe`
-   - **macOS**: `BibTeX-Deduplicator` (macOS binary)
-   - **Linux**: `BibTeX-Deduplicator` (Linux binary)
+   - **Windows**: `BibTeX-Deduplicator-windows.exe`
+   - **macOS**: `BibTeX-Deduplicator-macos`
+   - **Linux**: `BibTeX-Deduplicator-linux`
 3. Double-click to run - no Python installation required!
 
 ### Option 2: Run from Source
@@ -101,10 +101,6 @@ For automated processing or integration into scripts:
 bibtex-deduplicator/
 ├── bib_deduplicator.py      # Main application
 ├── build-deduplicator.py    # Build script for creating executables
-├── dist/                    # Pre-built executables
-│   ├── BibTeX-Deduplicator.exe      # Windows executable
-│   ├── BibTeX-Deduplicator-macos    # macOS executable  
-│   └── BibTeX-Deduplicator-linux    # Linux executable
 ├── README.md               # This file
 └── LICENSE                 # License file
 ```
@@ -174,7 +170,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Application won't start on macOS**
 - Right-click → "Open" to bypass security restrictions
-- Or run: `xattr -d com.apple.quarantine BibTeX-Deduplicator`
+- Or run: `xattr -d com.apple.quarantine BibTeX-Deduplicator-macos`
 
 **Large files are slow**
 - Use command line mode for better performance

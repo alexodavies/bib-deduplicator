@@ -1,10 +1,8 @@
 name: Build Executables
-
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -50,11 +48,13 @@ jobs:
         path: dist/${{ matrix.executable_name }}
         retention-days: 90
 
-  # Job to collect all artifacts and commit to repo
-  commit-executables:
+  # Job to create GitHub release with all artifacts
+  release:
     needs: build
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
     
     steps:
     - name: Checkout code
@@ -87,10 +87,13 @@ jobs:
         mv dist/BibTeX-Deduplicator dist/BibTeX-Deduplicator-macos
         cp dist/BibTeX-Deduplicator-macos dist/BibTeX-Deduplicator-linux
     
-    - name: Commit executables
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add dist/
-        git commit -m "Add built executables for ${{ github.ref_name }}" || exit 0
-        git push
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          dist/BibTeX-Deduplicator-windows.exe
+          dist/BibTeX-Deduplicator-macos
+          dist/BibTeX-Deduplicator-linux
+        generate_release_notes: true
+        draft: false
+        prerelease: false
