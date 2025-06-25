@@ -1,0 +1,3 @@
+([('BibTeX-Deduplicator',
+   '/Users/qj19962/Documents/side_projects/bib-deduplicator/dist/BibTeX-Deduplicator',
+   'EXECUTABLE')],)

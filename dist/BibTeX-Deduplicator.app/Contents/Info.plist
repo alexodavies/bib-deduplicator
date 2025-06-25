@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>BibTeX-Deduplicator</string>
+	<key>CFBundleExecutable</key>
+	<string>BibTeX-Deduplicator</string>
+	<key>CFBundleIconFile</key>
+	<string>generated-e1d0017d8f2bd517afa536b3bdb611a7ba102f1a4e1472900dd757cf8b4d71a5.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.bibtex.deduplicator</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>BibTeX-Deduplicator</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.0.0</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+</dict>
+</plist>
