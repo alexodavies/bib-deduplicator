@@ -4,6 +4,9 @@ on:
   push:
     tags: ['v*']
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -42,10 +45,49 @@ jobs:
     - name: Build executable
       run: python build-deduplicator.py
     
-    - name: Upload to release
-      uses: softprops/action-gh-release@v1
+    - name: Rename executable for upload
+      shell: bash
+      run: |
+        cd dist
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          mv BibTeX-Deduplicator.exe ${{ matrix.asset_name }}
+        else
+          mv BibTeX-Deduplicator ${{ matrix.asset_name }}
+        fi
+    
+    - name: Upload executable as artifact
+      uses: actions/upload-artifact@v4
       with:
-        files: dist/${{ matrix.executable_name }}
         name: ${{ matrix.asset_name }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        path: dist/${{ matrix.asset_name }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ./artifacts
+    
+    - name: Create Release
+      uses: ncipollo/create-release@v1
+      with:
+        artifacts: "artifacts/*/*"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ github.ref_name }}
+        name: "BibTeX Deduplicator ${{ github.ref_name }}"
+        body: |
+          ## BibTeX Deduplicator ${{ github.ref_name }}
+          
+          Cross-platform executables for BibTeX deduplication.
+          
+          ### Downloads
+          - **Windows**: `BibTeX-Deduplicator-windows.exe`
+          - **macOS**: `BibTeX-Deduplicator-macos`
+          - **Linux**: `BibTeX-Deduplicator-linux`
+          
+          ### Usage
+          Simply download the appropriate file for your platform and double-click to run!
+        draft: false
+        prerelease: false
