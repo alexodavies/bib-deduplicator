@@ -26,11 +26,11 @@ def install_pyinstaller():
     """Install PyInstaller if not present"""
     try:
         import PyInstaller
-        print("✓ PyInstaller already installed")
+        print("PyInstaller already installed")
     except ImportError:
         print("Installing PyInstaller...")
         subprocess.run([sys.executable, '-m', 'pip', 'install', 'pyinstaller'], check=True)
-        print("✓ PyInstaller installed")
+        print("PyInstaller installed")
 
 def build_app():
     """Build the application"""
