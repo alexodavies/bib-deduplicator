@@ -1,9 +1,8 @@
-name: Build Executables
+name: Build and Release
 
 on:
   push:
     tags: ['v*']
-  workflow_dispatch:
 
 jobs:
   build:
@@ -14,10 +13,13 @@ jobs:
         include:
           - os: windows-latest
             executable_name: BibTeX-Deduplicator.exe
+            asset_name: BibTeX-Deduplicator-windows.exe
           - os: macos-latest
             executable_name: BibTeX-Deduplicator
+            asset_name: BibTeX-Deduplicator-macos
           - os: ubuntu-latest
             executable_name: BibTeX-Deduplicator
+            asset_name: BibTeX-Deduplicator-linux
     
     steps:
     - name: Checkout code
@@ -40,9 +42,10 @@ jobs:
     - name: Build executable
       run: python build-deduplicator.py
     
-    - name: Upload executable
-      uses: actions/upload-artifact@v4
+    - name: Upload to release
+      uses: softprops/action-gh-release@v1
       with:
-        name: bibtex-deduplicator-${{ matrix.os }}
-        path: dist/${{ matrix.executable_name }}
-        retention-days: 90
+        files: dist/${{ matrix.executable_name }}
+        name: ${{ matrix.asset_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
